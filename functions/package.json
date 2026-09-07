@@ -4,12 +4,15 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "build": "tsc"
+  },
+  "dependencies": {
+    "firebase-admin": "^14.3.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
