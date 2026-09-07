@@ -1,9 +1,11 @@
+import type { RadarAnalysis } from "../domain/types.js";
+
 export interface DailyRadarDocument {
   generatedAt: string;
-  top10: unknown[];
-  watchlist: unknown[];
-  overheated: unknown[];
-  weakSignals: unknown[];
+  top10: RadarAnalysis[];
+  watchlist: RadarAnalysis[];
+  overheated: RadarAnalysis[];
+  weakSignals: RadarAnalysis[];
 }
 
 export interface DailyRadarReader {
