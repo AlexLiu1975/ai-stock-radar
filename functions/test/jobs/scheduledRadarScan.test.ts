@@ -12,6 +12,7 @@ describe("scheduled radar scan", () => {
       discovered: 1000,
       analyzed: 980,
       skipped: 15,
+      published: true,
       failed: [],
     }));
     const handler = createScheduledRadarScan(scan);
@@ -20,5 +21,20 @@ describe("scheduled radar scan", () => {
 
     expect(scan).toHaveBeenCalledWith("2026-09-07");
     expect(result.analyzed).toBe(980);
+  });
+
+  it("fails the scheduled run when attempted coverage is too low to publish", async () => {
+    const handler = createScheduledRadarScan(async (targetDate) => ({
+      targetDate,
+      discovered: 1000,
+      analyzed: 100,
+      skipped: 0,
+      published: false,
+      failed: [{ symbol: "2330", reason: "upstream unavailable" }],
+    }));
+
+    await expect(handler("2026-09-07T10:00:00.000Z")).rejects.toThrow(
+      "coverage was too low to publish",
+    );
   });
 });

@@ -4,7 +4,11 @@ type Scan = (targetDate: string) => Promise<DailyMarketScanResult>;
 
 export function createScheduledRadarScan(scan: Scan) {
   return async (scheduleTime: string): Promise<DailyMarketScanResult> => {
-    return scan(taipeiDate(scheduleTime));
+    const result = await scan(taipeiDate(scheduleTime));
+    if (!result.published && result.analyzed > 0) {
+      throw new Error(`Daily market scan coverage was too low to publish for ${result.targetDate}`);
+    }
+    return result;
   };
 }
 

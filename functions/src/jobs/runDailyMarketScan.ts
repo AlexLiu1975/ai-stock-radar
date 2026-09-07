@@ -29,6 +29,7 @@ export interface DailyMarketScanResult {
   discovered: number;
   analyzed: number;
   skipped: number;
+  published: boolean;
   failed: Array<{ symbol: string; reason: string }>;
 }
 
@@ -66,7 +67,8 @@ export async function runDailyMarketScan(options: DailyMarketScanOptions): Promi
 
   const attempted = analyses.length + failed.length;
   const coverage = attempted === 0 ? 0 : analyses.length / attempted;
-  if (analyses.length > 0 && coverage >= (options.minimumCoverage ?? 0.8)) {
+  const published = analyses.length > 0 && coverage >= (options.minimumCoverage ?? 0.8);
+  if (published) {
     await options.repository.saveDailyRadar(options.targetDate, generateDailyRadar(analyses));
   }
 
@@ -75,6 +77,7 @@ export async function runDailyMarketScan(options: DailyMarketScanOptions): Promi
     discovered: symbols.length,
     analyzed: analyses.length,
     skipped,
+    published,
     failed,
   };
 }

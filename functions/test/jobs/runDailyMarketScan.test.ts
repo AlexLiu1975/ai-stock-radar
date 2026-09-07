@@ -52,6 +52,7 @@ describe("runDailyMarketScan", () => {
       discovered: 3,
       analyzed: 2,
       skipped: 0,
+      published: true,
       failed: [{ symbol: "2603", reason: "upstream timeout" }],
     });
     expect(saveDailyStockAnalysis).toHaveBeenCalledTimes(2);
@@ -73,6 +74,7 @@ describe("runDailyMarketScan", () => {
 
     expect(result.skipped).toBe(1);
     expect(result.analyzed).toBe(0);
+    expect(result.published).toBe(false);
     expect(saveDailyRadar).not.toHaveBeenCalled();
   });
 
@@ -95,6 +97,7 @@ describe("runDailyMarketScan", () => {
 
     expect(result.analyzed).toBe(1);
     expect(result.failed).toHaveLength(2);
+    expect(result.published).toBe(false);
     expect(saveDailyRadar).not.toHaveBeenCalled();
   });
 });
