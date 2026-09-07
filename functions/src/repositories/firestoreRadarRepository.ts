@@ -1,7 +1,7 @@
 import type { RadarAnalysis } from "../domain/types.js";
 
 interface FirestoreDocLike {
-  set(value: unknown): Promise<void>;
+  set(value: Record<string, unknown>): Promise<unknown>;
   collection(name: string): {
     doc(id: string): FirestoreDocLike;
   };
@@ -37,7 +37,7 @@ export class FirestoreRadarRepository {
     await stockRef
       .collection("daily")
       .doc(analysis.date)
-      .set(analysis);
+      .set({ ...analysis });
   }
 
   async saveDailyRadar(date: string, buckets: DailyRadarBuckets): Promise<void> {

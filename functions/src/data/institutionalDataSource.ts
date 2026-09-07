@@ -30,6 +30,8 @@ const FIELD_TRUST_NET = "投信買賣超股數";
 const FIELD_DEALER_NET = "自營商買賣超股數";
 
 export class TwseInstitutionalDataSource implements InstitutionalDataSource {
+  private readonly dailyCache = new Map<string, Promise<Map<string, InstitutionalFlow>>>();
+
   constructor(private readonly fetcher: FetchLike = fetch) {}
 
   async fetchDailyFlows(
@@ -40,38 +42,55 @@ export class TwseInstitutionalDataSource implements InstitutionalDataSource {
     const result: DatedInstitutionalFlow[] = [];
 
     for (const date of datesBetween(from, to)) {
-      const url = new URL("https://www.twse.com.tw/rwd/zh/fund/T86");
-      url.searchParams.set("date", date.replaceAll("-", ""));
-      url.searchParams.set("selectType", "ALLBUT0999");
-      url.searchParams.set("response", "json");
-
-      const response = await this.fetcher(url.toString());
-      if (!response.ok) throw new Error(`TWSE T86 request failed for ${date}`);
-
-      const payload = (await response.json()) as TwseT86Payload;
-      if (payload.stat !== "OK" || !payload.fields || !payload.data) continue;
-
-      const symbolIndex = payload.fields.indexOf("證券代號");
-      const foreignIndex = payload.fields.indexOf(FIELD_FOREIGN_NET);
-      const trustIndex = payload.fields.indexOf(FIELD_TRUST_NET);
-      const dealerIndex = payload.fields.indexOf(FIELD_DEALER_NET);
-
-      if ([symbolIndex, foreignIndex, trustIndex, dealerIndex].some((index) => index < 0)) {
-        throw new Error("TWSE T86 response schema changed");
-      }
-
-      const row = payload.data.find((item) => item[symbolIndex]?.trim() === symbol);
-      if (!row) continue;
-
-      result.push({
-        date,
-        foreignNet: parseInteger(row[foreignIndex]),
-        trustNet: parseInteger(row[trustIndex]),
-        dealerNet: parseInteger(row[dealerIndex]),
-      });
+      const flows = await this.getDailyFlows(date);
+      const flow = flows.get(symbol);
+      if (flow) result.push({ date, ...flow });
     }
 
     return result;
+  }
+
+  private getDailyFlows(date: string): Promise<Map<string, InstitutionalFlow>> {
+    const cached = this.dailyCache.get(date);
+    if (cached) return cached;
+
+    const request = this.fetchDailyFlowsForAllSymbols(date).catch((error) => {
+      this.dailyCache.delete(date);
+      throw error;
+    });
+    this.dailyCache.set(date, request);
+    return request;
+  }
+
+  private async fetchDailyFlowsForAllSymbols(date: string): Promise<Map<string, InstitutionalFlow>> {
+    const url = new URL("https://www.twse.com.tw/rwd/zh/fund/T86");
+    url.searchParams.set("date", date.replaceAll("-", ""));
+    url.searchParams.set("selectType", "ALLBUT0999");
+    url.searchParams.set("response", "json");
+
+    const response = await this.fetcher(url.toString());
+    if (!response.ok) throw new Error(`TWSE T86 request failed for ${date}`);
+
+    const payload = (await response.json()) as TwseT86Payload;
+    if (payload.stat !== "OK" || !payload.fields || !payload.data) return new Map();
+
+    const symbolIndex = payload.fields.indexOf("證券代號");
+    const foreignIndex = payload.fields.indexOf(FIELD_FOREIGN_NET);
+    const trustIndex = payload.fields.indexOf(FIELD_TRUST_NET);
+    const dealerIndex = payload.fields.indexOf(FIELD_DEALER_NET);
+
+    if ([symbolIndex, foreignIndex, trustIndex, dealerIndex].some((index) => index < 0)) {
+      throw new Error("TWSE T86 response schema changed");
+    }
+
+    return new Map(payload.data.map((row) => [
+      row[symbolIndex]!.trim(),
+      {
+        foreignNet: parseInteger(row[foreignIndex]),
+        trustNet: parseInteger(row[trustIndex]),
+        dealerNet: parseInteger(row[dealerIndex]),
+      },
+    ]));
   }
 }
 

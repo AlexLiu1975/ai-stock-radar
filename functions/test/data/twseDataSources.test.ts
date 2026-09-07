@@ -63,4 +63,32 @@ describe("TWSE data sources", () => {
       { date: "2026-09-04", foreignNet: 2000, trustNet: 4000, dealerNet: -500 },
     ]);
   });
+
+  it("shares each T86 trading-day response across symbols", async () => {
+    let calls = 0;
+    const fetcher = async () => {
+      calls += 1;
+      return {
+        ok: true,
+        json: async () => ({
+          stat: "OK",
+          fields: ["證券代號", "外陸資買賣超股數(不含外資自營商)", "投信買賣超股數", "自營商買賣超股數"],
+          data: [
+            ["1101", "1,000", "200", "50"],
+            ["2330", "2,000", "400", "-100"],
+          ],
+        }),
+      };
+    };
+    const source = new TwseInstitutionalDataSource(fetcher);
+
+    const [first, second] = await Promise.all([
+      source.fetchDailyFlows("1101", "2026-09-04", "2026-09-04"),
+      source.fetchDailyFlows("2330", "2026-09-04", "2026-09-04"),
+    ]);
+
+    expect(calls).toBe(1);
+    expect(first[0]).toMatchObject({ date: "2026-09-04", foreignNet: 1000 });
+    expect(second[0]).toMatchObject({ date: "2026-09-04", foreignNet: 2000 });
+  });
 });
