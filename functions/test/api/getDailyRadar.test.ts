@@ -1,9 +1,19 @@
 import { describe, expect, it } from "vitest";
 import { getDailyRadar } from "../../src/api/getDailyRadar.js";
+import type { RadarAnalysis } from "../../src/domain/types.js";
+
+const topPick: RadarAnalysis = {
+  symbol: "2330",
+  date: "2026-09-07",
+  score: 88,
+  signal: "RISE_CONFIRMED",
+  riskFlags: [],
+  breakdown: { institutional: 36, technical: 52 },
+};
 
 const radar = {
   generatedAt: "2026-09-07",
-  top10: [{ symbol: "2330", score: 88 }],
+  top10: [topPick],
   watchlist: [],
   overheated: [],
   weakSignals: [],
