@@ -1,0 +1,25 @@
+{
+  "name": "ai-stock-radar-functions",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:emulator": "vitest run --config vitest.integration.config.ts",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "audit:prod": "npm audit --omit=dev --audit-level=high"
+  },
+  "dependencies": {
+    "firebase-admin": "^14.3.0",
+    "firebase-functions": "^7.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2",
+    "vitest": "^5.0.0"
+  }
+}

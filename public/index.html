@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#07111f" />
+  <title>AI 起漲雷達｜台股動能偵測</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">AI</span>
+      <div>
+        <strong>AI 起漲雷達</strong>
+        <small>法人籌碼 × KD × MACD × 量價</small>
+      </div>
+    </div>
+    <div class="market-status" id="marketStatus">資料載入中</div>
+  </header>
+
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">TAIWAN STOCK MOMENTUM RADAR</p>
+        <h1>找法人已動、技術剛轉強，<br />價格還沒完全反映的股票。</h1>
+        <p class="hero-copy">每日以 100 分模型掃描台股，將起漲候選、觀察股與過熱風險分流顯示。</p>
+      </div>
+      <div class="hero-score">
+        <span>今日雷達</span>
+        <strong id="topCount">—</strong>
+        <small>起漲候選</small>
+      </div>
+    </section>
+
+    <section class="summary-grid">
+      <article class="metric-card">
+        <span>🟢 起漲候選</span>
+        <strong id="candidateCount">—</strong>
+        <small>RISE / EARLY RISE</small>
+      </article>
+      <article class="metric-card">
+        <span>🟡 觀察名單</span>
+        <strong id="watchCount">—</strong>
+        <small>等待確認</small>
+      </article>
+      <article class="metric-card warning">
+        <span>⚠️ 過熱警示</span>
+        <strong id="overheatCount">—</strong>
+        <small>高分但禁止追高</small>
+      </article>
+      <article class="metric-card">
+        <span>更新日期</span>
+        <strong class="date-value" id="radarDate">—</strong>
+        <small id="dataSource">TWSE / Firestore</small>
+      </article>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">TOP 10</p>
+          <h2>AI 起漲候選</h2>
+        </div>
+        <button id="refreshButton" type="button">重新整理</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>股票</th>
+              <th>法人</th>
+              <th>技術</th>
+              <th>AI 分數</th>
+              <th>訊號</th>
+              <th>風險</th>
+            </tr>
+          </thead>
+          <tbody id="radarRows">
+            <tr><td colspan="7" class="empty">正在讀取每日雷達資料…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="legend">
+      <div><span class="dot green"></span><strong>80–100</strong> 起漲確認</div>
+      <div><span class="dot amber"></span><strong>65–79</strong> 提前埋伏</div>
+      <div><span class="dot gray"></span><strong>50–64</strong> 觀察</div>
+      <div><span class="dot red"></span><strong>&lt;50</strong> 弱勢</div>
+    </section>
+
+    <p class="disclaimer">本系統提供市場資料整理、技術指標與量化訊號，僅供研究參考，不構成投資建議或獲利保證。</p>
+  </main>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
