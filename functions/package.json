@@ -8,6 +8,7 @@
   },
   "scripts": {
     "test": "vitest run",
+    "test:emulator": "vitest run test/integration/**/*.test.ts",
     "typecheck": "tsc --noEmit",
     "build": "tsc",
     "audit:prod": "npm audit --omit=dev --audit-level=high"
