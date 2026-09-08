@@ -22,3 +22,6 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      - name: Firestore emulator integration test
+        working-directory: .
+        run: npx --yes firebase-tools@15.29.0 emulators:exec --only firestore --project ai-stock-radar-test "cd functions && npm run test:emulator"
